@@ -7,6 +7,7 @@ import moais.todoManage.msjo.util.JwtUtil;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.data.redis.core.StringRedisTemplate;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
@@ -47,8 +48,12 @@ public class SecurityConfig {
                 .httpBasic(AbstractHttpConfigurer::disable)
                 .sessionManagement(s -> s.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(auth -> {
-                            auth.requestMatchers(RESOURCE_WHITELIST).permitAll();
-                            auth.requestMatchers(API_WHITELIST).permitAll();
+                            auth
+                                .requestMatchers(RESOURCE_WHITELIST).permitAll()
+                                .requestMatchers(API_WHITELIST).permitAll()
+                                .requestMatchers(HttpMethod.OPTIONS).permitAll()
+                                .anyRequest().authenticated();
+
                         }
                 )
                 .addFilterBefore(new JwtAuthFilter(jwtUserDetailsService, jwtUtil), UsernamePasswordAuthenticationFilter.class);

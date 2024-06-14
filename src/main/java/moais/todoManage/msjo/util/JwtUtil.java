@@ -59,14 +59,6 @@ public class JwtUtil {
                     .compact();
     }
 
-    public String getAuthType(String jwt) {
-        return parseClaims(jwt).get("authType", String.class);
-    }
-
-    public String getId(String jwt) {
-        return parseClaims(jwt).get("id", String.class);
-    }
-
     public Long getSeq(String jwt) {
         return parseClaims(jwt).get("seq", Long.class);
     }

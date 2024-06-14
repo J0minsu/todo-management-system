@@ -41,9 +41,9 @@ public class SecurityDetailsService implements UserDetailsService {
         return new SecurityUserDetails(securityUserInfo, authorities);
     }
 
-    private SecurityUserInfo getSecurityUserInfo(String id) {
+    private SecurityUserInfo getSecurityUserInfo(String seq) {
 
-        Member member = memberService.findById(id);
+        Member member = memberService.findBySeq(Long.parseLong(seq));
 
         if(Objects.isNull(member)) {
             throw new BusinessException(HttpStatus.NOT_FOUND);
@@ -54,7 +54,6 @@ public class SecurityDetailsService implements UserDetailsService {
         }
 
         SecurityUserInfo securityUserInfo = memberMapper.toSecurityUserInfo(member);
-
         return securityUserInfo;
 
     }

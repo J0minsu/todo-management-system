@@ -57,6 +57,9 @@ public class Member extends BaseTime {
     @OneToMany(mappedBy = "member", fetch = FetchType.LAZY)
     List<Todo> todos = Lists.newArrayList();
 
+    @OneToMany(mappedBy = "member", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    List<MemberActiveHistory> activeHistories = Lists.newArrayList();
+
     private Member(String nickname, String id, String password) {
         this.nickname = nickname;
         this.id = id;
@@ -73,6 +76,19 @@ public class Member extends BaseTime {
 
     public void changeNickname(String nickname) {
         this.nickname = nickname;
+    }
+
+    public void makeInactive(String reason) {
+        this.isActive = false;
+        this.inactiveAt = LocalDateTime.now();
+        this.getActiveHistories().add(MemberActiveHistory.inactiveLog(this, reason));
+    }
+
+    public void makeActive() {
+        this.isActive = true;
+        this.inactiveAt = null;
+        this.getActiveHistories().add(MemberActiveHistory.activeLog(this));
+
     }
 
 }

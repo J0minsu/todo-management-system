@@ -1,6 +1,8 @@
 package moais.todoManage.msjo.domain.member.service;
 
+import jakarta.persistence.EntityManager;
 import moais.todoManage.msjo.domain.member.dto.req.MemberCreateReq;
+import moais.todoManage.msjo.domain.member.dto.req.MemberInactiveReq;
 import moais.todoManage.msjo.entity.domain.Member;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -28,6 +30,8 @@ class MemberServiceTest {
 
     @Autowired
     MemberService memberService;
+    @Autowired
+    EntityManager entityManager;
 
     @Test
     public void 사용자는_생성이_돼야한다() throws Exception {
@@ -73,22 +77,60 @@ class MemberServiceTest {
     public void 닉네임은_변경될_수_있어야_한다() throws Exception {
     
         //given
-        
+        MemberCreateReq request = new MemberCreateReq("msjo", "one", "qwe123!@#");
+        Member member = memberService.createUser(request);
         //when
-        
+        String afterNickname = "two";
+
+        member.changeNickname(afterNickname);
+
+        Member afterMember = memberService.findById(request.getId());
+
         //then
-    
+        assertEquals(afterNickname, afterMember.getNickname());
+
     }
-    
+
     @Test
     public void 사용자는_비활성화_될_수_있어야_한다() throws Exception {
     
         //given
-        
+        MemberCreateReq request = new MemberCreateReq("msjo", "one", "qwe123!@#");
+        Member member = memberService.createUser(request);
         //when
-        
+        boolean beforeIsActive = member.isActive();
+
+        memberService.makeInactive(member.getSeq(), new MemberInactiveReq("더이상 활동 못할거같아서요"));
+
+        Member afterMember = memberService.findById(request.getId());
+        boolean afterIsActive = afterMember.isActive();
+
         //then
-    
+        assertEquals(beforeIsActive, !afterIsActive);
+        assertEquals(afterIsActive, false);
+
+    }
+
+
+    @Test
+    public void 사용자는_활성화_될_수_있어야_한다() throws Exception {
+
+        //given
+        MemberCreateReq request = new MemberCreateReq("msjo", "one", "qwe123!@#");
+        Member member = memberService.createUser(request);
+        //when
+        member.makeInactive("더이상 활동 못할거같아서요");
+        boolean beforeIsActive = member.isActive();
+
+        memberService.makeActive(member.getSeq());
+
+        Member afterMember = memberService.findById(request.getId());
+        boolean afterIsActive = afterMember.isActive();
+
+        //then
+        assertEquals(beforeIsActive, !afterIsActive);
+        assertEquals(afterIsActive, true);
+
     }
     
 }

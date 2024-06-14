@@ -1,7 +1,6 @@
 package moais.todoManage.msjo.domain.member.dto.req;
 
 import io.swagger.v3.oas.annotations.media.Schema;
-import jakarta.validation.constraints.NotEmpty;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -10,32 +9,23 @@ import lombok.experimental.FieldDefaults;
 
 /**
  * packageName    : moais.todoManage.msjo.domain.member.dto.req
- * fileName       : MemberCreateReq
+ * fileName       : MemberModifyNicknameReq
  * author         : ms.jo
- * date           : 2024. 6. 13.
+ * date           : 2024. 6. 14.
  * description    :
  * ===========================================================
  * DATE              AUTHOR             NOTE
  * -----------------------------------------------------------
- * 2024. 6. 13.        ms.jo       최초 생성
+ * 2024. 6. 14.        ms.jo       최초 생성
  */
 @Data
 @NoArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE)
-@Schema(title = "사용자 생성 DTO")
+@Schema(title = "사용자 닉네임 변경 요청 DTO")
 @AllArgsConstructor
-public class MemberCreateReq {
+public class MemberModifyNicknameReq {
 
-    @NotEmpty(message = "id must be not null or empty")
-    @Schema(example = "msjo")
-    String id;
-
-    @NotEmpty(message = "nickname must be not null or empty")
-    @Schema(example = "jo")
+    @Schema(example = "teresa")
     String nickname;
-
-    @NotEmpty(message = "password must be not null or empty")
-    @Schema(example = "qwe123!@#")
-    String password;
 
 }

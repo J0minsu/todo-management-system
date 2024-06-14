@@ -7,6 +7,7 @@ import jakarta.servlet.http.HttpServletResponse;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
+import lombok.extern.slf4j.Slf4j;
 import moais.todoManage.msjo.config.exception.BusinessException;
 import moais.todoManage.msjo.util.JwtUtil;
 import org.springframework.data.redis.core.StringRedisTemplate;
@@ -20,6 +21,7 @@ import java.io.IOException;
 
 @RequiredArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
+@Slf4j
 public class JwtAuthFilter extends OncePerRequestFilter {
 
     SecurityDetailsService jwtUserDetailsService;
@@ -43,9 +45,9 @@ public class JwtAuthFilter extends OncePerRequestFilter {
 
             if (jwtUtil.validateToken(jwt)) {
 
-                String id = jwtUtil.getId(jwt);
+                Long seq = jwtUtil.getSeq(jwt);
 
-                UserDetails userDetails = jwtUserDetailsService.loadUserByUsername(id);
+                UserDetails userDetails = jwtUserDetailsService.loadUserByUsername(String.valueOf(seq));
 
                 if (userDetails != null) {
                     // jwt이므로 2번째 파라미터 credentials(password)를 null로 넘겨도 문제 없음(이미 앞 단계에서 인증 완료됨)

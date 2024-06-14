@@ -1,7 +1,6 @@
 package moais.todoManage.msjo.domain.member.dto.req;
 
 import io.swagger.v3.oas.annotations.media.Schema;
-import jakarta.validation.constraints.NotEmpty;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -10,32 +9,23 @@ import lombok.experimental.FieldDefaults;
 
 /**
  * packageName    : moais.todoManage.msjo.domain.member.dto.req
- * fileName       : MemberCreateReq
+ * fileName       : MemberInactiveReq
  * author         : ms.jo
- * date           : 2024. 6. 13.
+ * date           : 2024. 6. 14.
  * description    :
  * ===========================================================
  * DATE              AUTHOR             NOTE
  * -----------------------------------------------------------
- * 2024. 6. 13.        ms.jo       최초 생성
+ * 2024. 6. 14.        ms.jo       최초 생성
  */
 @Data
 @NoArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE)
-@Schema(title = "사용자 생성 DTO")
+@Schema(title = "사용자 비활성화 요청 DTO")
 @AllArgsConstructor
-public class MemberCreateReq {
+public class MemberInactiveReq {
 
-    @NotEmpty(message = "id must be not null or empty")
-    @Schema(example = "msjo")
-    String id;
-
-    @NotEmpty(message = "nickname must be not null or empty")
-    @Schema(example = "jo")
-    String nickname;
-
-    @NotEmpty(message = "password must be not null or empty")
-    @Schema(example = "qwe123!@#")
-    String password;
+    @Schema(example = "개인 사유로 인해 더이상 활동할 수 없어서")
+    String reason;
 
 }
