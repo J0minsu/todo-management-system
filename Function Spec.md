@@ -33,7 +33,7 @@
      2. IN PROGRESS (진행 중)
      3. DONE (완료)
      4. PENDING (대기)
-        - **DONE 상태에서만 PENDING 상태로 변경될 수 있어야 한다.**
+        - **IN PROGRESS 상태에서만 PENDING 상태로 변경될 수 있어야 한다.**
         - **PENDING 상태에서는 어떤 상태로도 변경할 수 있어야 한다.**
 
 
