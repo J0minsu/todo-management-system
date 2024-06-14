@@ -1,7 +1,6 @@
 package moais.todoManage.msjo.entity.domain;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.google.common.collect.Lists;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Getter;
@@ -9,7 +8,6 @@ import lombok.NoArgsConstructor;
 import lombok.ToString;
 import lombok.experimental.FieldDefaults;
 import moais.todoManage.msjo.entity.common.audit.BaseTime;
-import moais.todoManage.msjo.entity.common.enums.UserType;
 import org.hibernate.annotations.Comment;
 import org.hibernate.annotations.DynamicUpdate;
 
@@ -41,9 +39,10 @@ public class TodoHistory extends BaseTime {
     Long seq;
 
     @Comment("변경 전 data")
+    @Column(length = 2048)
     String beforeData;
     @Comment("변경 후 data")
-    @Column(nullable = false)
+    @Column(nullable = false, length = 2048)
     String afterData;
 
     @ManyToOne(fetch = FetchType.LAZY)

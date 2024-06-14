@@ -10,12 +10,14 @@ import lombok.NoArgsConstructor;
 import lombok.ToString;
 import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
+import moais.todoManage.msjo.config.exception.BusinessException;
 import moais.todoManage.msjo.entity.common.audit.BaseTime;
 import moais.todoManage.msjo.entity.common.enums.TodoStatus;
 import moais.todoManage.msjo.util.JSONUtil;
 import org.hibernate.annotations.Comment;
 import org.hibernate.annotations.DynamicUpdate;
 import org.jetbrains.annotations.NotNull;
+import org.springframework.http.HttpStatus;
 
 import java.io.Serializable;
 import java.time.LocalDateTime;
@@ -117,8 +119,10 @@ public class Todo extends BaseTime {
         if (Objects.equals(this.status, TodoStatus.IN_PROGRESS)) {
             return updateStatus(TodoStatus.PENDING);
         }
+
         log.error("Changing to the Pending state is only possible when in the Progress state.");
-        return false;
+
+        throw new BusinessException(HttpStatus.BAD_REQUEST);
     }
 
     private boolean updateStatus(TodoStatus newStatus) {

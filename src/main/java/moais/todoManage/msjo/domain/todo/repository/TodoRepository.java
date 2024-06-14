@@ -26,4 +26,7 @@ public interface TodoRepository extends JpaRepository<Todo, Long> {
 
     @EntityGraph(attributePaths = {"histories"})
     Page<Todo> findByMemberOrderByCreatedAtDesc(Member member, Pageable pageable);
+
+    @EntityGraph(attributePaths = {"histories"})
+    Todo findByMemberAndSeq(Member member, Long seq);
 }

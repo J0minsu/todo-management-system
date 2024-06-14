@@ -18,12 +18,16 @@ import moais.todoManage.msjo.domain.member.dto.req.MemberCreateReq;
 import moais.todoManage.msjo.domain.member.dto.req.MemberInactiveReq;
 import moais.todoManage.msjo.domain.member.dto.req.MemberModifyNicknameReq;
 import moais.todoManage.msjo.domain.member.service.MemberService;
+import moais.todoManage.msjo.domain.todo.dto.req.TodoChangeStatusReq;
 import moais.todoManage.msjo.domain.todo.dto.req.TodoCreateReq;
 import moais.todoManage.msjo.domain.todo.dto.res.TodoFindRes;
 import moais.todoManage.msjo.domain.todo.mapper.TodoMapper;
 import moais.todoManage.msjo.domain.todo.service.TodoService;
+import moais.todoManage.msjo.entity.common.enums.TodoStatus;
 import moais.todoManage.msjo.entity.domain.Member;
 import moais.todoManage.msjo.entity.domain.Todo;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
@@ -66,10 +70,11 @@ public class TodoController {
     @Operation(summary = "TODO 생성")
     @ApiResponses(value ={
         @ApiResponse(responseCode = "200", description = "생성 완료"),
-        @ApiResponse(responseCode = "400", description = "ID or Nickname 중복"),
+        @ApiResponse(responseCode = "403", description = "만료된 토큰"),
+        @ApiResponse(responseCode = "404", description = "사용자 정보 일치하지 않음"),
     }
     )
-    @PostMapping("/join")
+    @PostMapping
     public ResponseEntity addTODO(@RequestBody TodoCreateReq request,
                                   @AuthenticationPrincipal SecurityUserDetails details) {
 
@@ -89,6 +94,8 @@ public class TodoController {
     @Operation(summary = "가장 최근 TODO 조회")
     @ApiResponses(value ={
         @ApiResponse(responseCode = "200", description = "요청 성공"),
+        @ApiResponse(responseCode = "403", description = "만료된 토큰"),
+        @ApiResponse(responseCode = "404", description = "사용자 정보 일치하지 않음"),
     })
     @GetMapping("/lastest")
     public ResponseEntity findLastestTodo(@AuthenticationPrincipal SecurityUserDetails details) {
@@ -103,9 +110,54 @@ public class TodoController {
 
     }
 
+    @Operation(summary = "TODO 목록 조회")
+    @ApiResponses(value ={
+        @ApiResponse(responseCode = "200", description = "요청 성공"),
+        @ApiResponse(responseCode = "403", description = "만료된 토큰"),
+        @ApiResponse(responseCode = "404", description = "사용자 정보 일치하지 않음"),
+    })
+    @GetMapping
+    public ResponseEntity findTodos(
+            int size, int page,
+            @AuthenticationPrincipal SecurityUserDetails details) {
+
+        Member member = memberService.findBySeq(details.getSeq());
+
+        log.info("member :: {}", member);
+
+        Page<Todo> todos = todoService.findTodos(member, PageRequest.of( page - 1 < 0 ? 0 : page -1, size));
+
+        Page<TodoFindRes> result = todos.map(i -> todoMapper.toTodoFindRes(i));
+
+        return ResponseEntity.ok(result);
+
+    }
+
     /**
      * UPDATE BLOCK
      */
+    @Operation(summary = "TODO 상태 변경")
+    @ApiResponses(value ={
+        @ApiResponse(responseCode = "200", description = "변경 완료"),
+        @ApiResponse(responseCode = "403", description = "만료된 토큰"),
+        @ApiResponse(responseCode = "404", description = "사용자 정보 일치하지 않음"),
+        @ApiResponse(responseCode = "400", description = "진행중 상태에서만 대기 상태로 변경 가능"),
+    })
+    @PatchMapping("/{seq}")
+    public ResponseEntity changeToTodo(
+            @PathVariable Long seq,
+            @RequestBody TodoChangeStatusReq request,
+            @AuthenticationPrincipal SecurityUserDetails details) {
+
+        Member member = memberService.findBySeq(details.getSeq());
+
+        Todo afterTodo = todoService.changeStatus(member, seq, request.getStatus());
+        TodoFindRes result = todoMapper.toTodoFindRes(afterTodo);
+
+        return ResponseEntity.ok(result);
+
+    }
+
 
     /**
      * DELETE BLOCK

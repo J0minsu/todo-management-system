@@ -15,8 +15,6 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.List;
-
 /**
  * packageName    : moais.todoManage.msjo.domain.todo.service
  * fileName       : TodoService
@@ -51,6 +49,11 @@ public class TodoService {
     }
 
     @Transactional(readOnly = true)
+    public Todo findById(Member member, Long seq) {
+        return todoRepository.findByMemberAndSeq(member, seq);
+    }
+
+    @Transactional(readOnly = true)
     public Page<Todo> findTodos(Member member, Pageable pageable) {
         return todoRepository.findByMemberOrderByCreatedAtDesc(member, pageable);
     }
@@ -60,4 +63,17 @@ public class TodoService {
         return todos.isEmpty() ? null : todos.getContent().get(0);
     }
 
+    public Todo changeStatus(Member member, Long seq, TodoStatus todoStatus) {
+
+        Todo todo = findById(member, seq);
+
+        switch (todoStatus) {
+            case TODO -> todo.toTODO();
+            case DONE -> todo.toDone();
+            case PENDING -> todo.toPending();
+            case IN_PROGRESS -> todo.toProgress();
+        }
+
+        return todo;
+    }
 }
