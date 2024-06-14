@@ -4,9 +4,18 @@ import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
+import moais.todoManage.msjo.domain.todo.dto.req.TodoCreateReq;
 import moais.todoManage.msjo.domain.todo.repository.TodoRepository;
+import moais.todoManage.msjo.entity.common.enums.TodoStatus;
+import moais.todoManage.msjo.entity.domain.Member;
+import moais.todoManage.msjo.entity.domain.Todo;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.List;
 
 /**
  * packageName    : moais.todoManage.msjo.domain.todo.service
@@ -27,5 +36,28 @@ import org.springframework.transaction.annotation.Transactional;
 public class TodoService {
 
     TodoRepository todoRepository;
+
+    public Todo createTodo(Member member, TodoCreateReq request) {
+
+        Todo todo = Todo.create(TodoStatus.TODO, request.getContents(), request.getComment(), request.getScheduledAt(), member);
+
+        try {
+            return todoRepository.save(todo);
+        } catch (RuntimeException e) {
+            log.error(e.getMessage());
+            return Todo.createEmptyObject();
+        }
+
+    }
+
+    @Transactional(readOnly = true)
+    public Page<Todo> findTodos(Member member, Pageable pageable) {
+        return todoRepository.findByMemberOrderByCreatedAtDesc(member, pageable);
+    }
+
+    public Todo findLastestTodo(Member member) {
+        Page<Todo> todos = findTodos(member, PageRequest.of(0, 1));
+        return todos.isEmpty() ? null : todos.getContent().get(0);
+    }
 
 }

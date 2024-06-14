@@ -54,7 +54,7 @@ public class Member extends BaseTime {
     @Comment("비활성화 일시")
     LocalDateTime inactiveAt;
 
-    @OneToMany(mappedBy = "member", fetch = FetchType.LAZY)
+    @OneToMany(mappedBy = "member", fetch = FetchType.EAGER)
     List<Todo> todos = Lists.newArrayList();
 
     @OneToMany(mappedBy = "member", fetch = FetchType.LAZY, cascade = CascadeType.ALL)

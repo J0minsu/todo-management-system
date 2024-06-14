@@ -2,6 +2,8 @@ package moais.todoManage.msjo.domain.todo.mapper;
 
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
+import moais.todoManage.msjo.domain.todo.dto.res.TodoFindRes;
+import moais.todoManage.msjo.entity.domain.Todo;
 import org.springframework.context.annotation.Configuration;
 
 /**
@@ -18,4 +20,9 @@ import org.springframework.context.annotation.Configuration;
 @Configuration
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class TodoMapper {
+
+    public TodoFindRes toTodoFindRes(Todo todo) {
+        return new TodoFindRes(todo.getSeq(), todo.getContents(), todo.getComment(), todo.getStatus(), todo.getScheduledAt());
+    }
+
 }

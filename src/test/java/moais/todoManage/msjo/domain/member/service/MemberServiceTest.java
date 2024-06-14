@@ -1,12 +1,14 @@
 package moais.todoManage.msjo.domain.member.service;
 
 import jakarta.persistence.EntityManager;
+import moais.todoManage.msjo.config.exception.BusinessException;
 import moais.todoManage.msjo.domain.member.dto.req.MemberCreateReq;
 import moais.todoManage.msjo.domain.member.dto.req.MemberInactiveReq;
 import moais.todoManage.msjo.entity.domain.Member;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.http.HttpStatus;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -42,6 +44,20 @@ class MemberServiceTest {
         Member member = memberService.createUser(request);
         //then
         assertEquals(request.getId(), member.getId());
+
+    }
+
+    @Test
+    public void 사용자는_생성_시_ID_및_Nickname이_다시_중복체크_돼야한다() throws Exception {
+
+        //given
+        MemberCreateReq request = new MemberCreateReq("msjo", "one", "qwe123!@#");
+        Member member = memberService.createUser(request);
+
+        //when
+        assertThrows(BusinessException.class, () -> {
+            memberService.createUser(request);
+        });
 
     }
 

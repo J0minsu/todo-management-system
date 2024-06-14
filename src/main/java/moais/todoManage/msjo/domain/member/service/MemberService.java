@@ -40,7 +40,7 @@ public class MemberService {
 
     public Member createUser(MemberCreateReq request) {
 
-        if(isDuplicateId(request.getId()) || isDuplicateNickname(request.getNickname())) {
+        if(!isDuplicateId(request.getId()) || !isDuplicateNickname(request.getNickname())) {
             throw new BusinessException(HttpStatus.BAD_REQUEST);
         }
 

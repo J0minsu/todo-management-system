@@ -2,6 +2,7 @@ package moais.todoManage.msjo.util;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
@@ -28,7 +29,7 @@ import org.springframework.stereotype.Service;
 @Slf4j
 public class JSONUtil {
 
-    static ObjectMapper mapper = new ObjectMapper();
+    static ObjectMapper mapper = new ObjectMapper().registerModule(new JavaTimeModule());
 
     public static String toJSONString(Object obj) {
         try {

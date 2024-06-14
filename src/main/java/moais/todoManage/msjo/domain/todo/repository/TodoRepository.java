@@ -1,8 +1,14 @@
 package moais.todoManage.msjo.domain.todo.repository;
 
+import moais.todoManage.msjo.entity.domain.Member;
 import moais.todoManage.msjo.entity.domain.Todo;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
+
+import java.util.List;
 
 /**
  * packageName    : moais.todoManage.msjo.domain.todo.repository
@@ -18,4 +24,6 @@ import org.springframework.stereotype.Repository;
 @Repository
 public interface TodoRepository extends JpaRepository<Todo, Long> {
 
+    @EntityGraph(attributePaths = {"histories"})
+    Page<Todo> findByMemberOrderByCreatedAtDesc(Member member, Pageable pageable);
 }

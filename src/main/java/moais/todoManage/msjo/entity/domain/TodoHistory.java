@@ -1,5 +1,6 @@
 package moais.todoManage.msjo.entity.domain;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.google.common.collect.Lists;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
@@ -40,7 +41,6 @@ public class TodoHistory extends BaseTime {
     Long seq;
 
     @Comment("변경 전 data")
-    @Column(nullable = false)
     String beforeData;
     @Comment("변경 후 data")
     @Column(nullable = false)
@@ -49,6 +49,8 @@ public class TodoHistory extends BaseTime {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "todo_seq")
     @Comment("할 일 순차번호")
+    //prevent infinite recursive
+    @JsonIgnore
     Todo todo;
 
     protected TodoHistory(String before, String after, Todo todo) {

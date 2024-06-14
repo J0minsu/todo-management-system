@@ -1,5 +1,6 @@
 package moais.todoManage.msjo.entity.domain;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.collect.Lists;
 import jakarta.persistence.*;
@@ -54,17 +55,45 @@ public class Todo extends BaseTime {
     @Comment("내용")
     String contents;
 
+    @Comment("코멘트")
+    String comment;
+
     @Comment("수행 예정 일시")
     LocalDateTime scheduledAt;
 
-    @ManyToOne
-    @JoinColumn(name = "user_seq")
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "member_seq")
     @Comment("사용자")
+    //prevent infinite recursive
+    @JsonIgnore
     Member member;
 
-    @OneToMany(mappedBy = "todo", fetch = FetchType.LAZY, orphanRemoval = false)
+    @OneToMany(mappedBy = "todo", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     List<TodoHistory> histories = Lists.newArrayList();
 
+    protected Todo(TodoStatus status, String contents, String comment, LocalDateTime scheduledAt, Member member) {
+        this.status = status;
+        this.contents = contents;
+        this.comment = comment;
+        this.scheduledAt = scheduledAt;
+        this.member = member;
+    }
+
+    public static Todo create(TodoStatus status, String contents, String comment, LocalDateTime scheduledAt, Member member) {
+
+        Todo todo = new Todo(status, contents, comment, scheduledAt, member);
+
+        todo.getHistories().add(TodoHistory.create(null, JSONUtil.toJSONString(todo), todo));
+
+        member.getTodos().add(todo);
+
+        return todo;
+
+    }
+
+    public static Todo createEmptyObject() {
+        return new Todo();
+    }
 
     /**
      * TODO history 관리를 어떻게 할 지 고민 중. 남긴다면 history 생성은 이 곳에서만. -- DONE
@@ -93,9 +122,9 @@ public class Todo extends BaseTime {
     }
 
     private boolean updateStatus(TodoStatus newStatus) {
-        String before = getJsonString();
+        String before = JSONUtil.toJSONString(this);
         this.status = newStatus;
-        String after = getJsonString();
+        String after = JSONUtil.toJSONString(this);
 
         TodoHistory history = new TodoHistory(before, after, this);
         this.histories.add(history);
@@ -103,9 +132,5 @@ public class Todo extends BaseTime {
         return true;
     }
 
-
-    private @NotNull String getJsonString() {
-        return JSONUtil.toJSONString(this);
-    }
 
 }
