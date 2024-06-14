@@ -4,7 +4,12 @@ import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
+import moais.todoManage.msjo.config.exception.BusinessException;
+import moais.todoManage.msjo.domain.member.mapper.MemberMapper;
+import moais.todoManage.msjo.domain.member.service.MemberService;
+import moais.todoManage.msjo.entity.domain.Member;
 import org.springframework.dao.EmptyResultDataAccessException;
+import org.springframework.http.HttpStatus;
 import org.springframework.jdbc.core.BeanPropertyRowMapper;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
@@ -16,6 +21,7 @@ import org.springframework.stereotype.Service;
 import javax.sql.DataSource;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 @Slf4j
 @Service
@@ -23,45 +29,33 @@ import java.util.List;
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 public class SecurityDetailsService implements UserDetailsService {
 
-    DataSource dataSource;
+    MemberService memberService;
+    MemberMapper memberMapper;
 
     @Override
     public UserDetails loadUserByUsername(String id) throws UsernameNotFoundException {
 
-        SecurityUserInfo jwtSecurityUserInfo = getJwtSecurityUserInfo(id);
-
-        // 추후 subject Table에 권한이 세분화되면 jwtSzecurityUserInfo에서 꺼내서 사용
+        SecurityUserInfo securityUserInfo = getSecurityUserInfo(id);
         List<SimpleGrantedAuthority> authorities = new ArrayList<>();
 
-        /*List<SimpleGrantedAuthority> authorities = UserType.SUBJECT.getRoles()
-                .stream().map(SimpleGrantedAuthority::new).toList();*/
-
-        return new SecurityUserDetails(jwtSecurityUserInfo, authorities);
+        return new SecurityUserDetails(securityUserInfo, authorities);
     }
 
-    private SecurityUserInfo getJwtSecurityUserInfo(String id) {
+    private SecurityUserInfo getSecurityUserInfo(String id) {
 
-        try {
-            return new JdbcTemplate(this.dataSource)
-                    .queryForObject(
-                            """
-                                     SELECT 
-                                         s.id,
-                                         s.password,
-                                         s.name, 
-                                         s.subject_seq as subjectSeq,
-                                         s.round,
-                                         s.center_seq
-                                     FROM subject s
-                                     WHERE s.id = ?
-                                     AND s.is_active = 1
-                                """,
-                            new BeanPropertyRowMapper<>(SecurityUserInfo.class),
-                            id);
-        } catch (EmptyResultDataAccessException e) {
-            log.info("Not Exist or Not active subject in DB - insert id :: {}", id);
-            throw new UsernameNotFoundException("등록된 대상자가 없습니다.");
+        Member member = memberService.findById(id);
+
+        if(Objects.isNull(member)) {
+            throw new BusinessException(HttpStatus.NOT_FOUND);
         }
+
+        if(!member.isActive()) {
+            throw new BusinessException(HttpStatus.FORBIDDEN);
+        }
+
+        SecurityUserInfo securityUserInfo = memberMapper.toSecurityUserInfo(member);
+
+        return securityUserInfo;
 
     }
 

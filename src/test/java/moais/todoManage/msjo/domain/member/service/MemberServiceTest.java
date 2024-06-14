@@ -41,8 +41,54 @@ class MemberServiceTest {
 
     }
 
-    /**
-     * TODO 실패케이스 정의
-     */
+    @Test
+    public void ID의_중복체크는_올바르게_수행돼야_한다() {
 
+        //given
+        MemberCreateReq request = new MemberCreateReq("msjo", "one", "qwe123!@#");
+        //when
+        Member member = memberService.createUser(request);
+        //then
+        memberService.findById(request.getId());
+
+        assertEquals(false, memberService.isDuplicateId(request.getId()));
+
+    }
+
+    @Test
+    public void 닉네임의_중복체크는_올바르게_수행돼야_한다() {
+
+        //given
+        MemberCreateReq request = new MemberCreateReq("msjo", "one", "qwe123!@#");
+        //when
+        Member member = memberService.createUser(request);
+        //then
+        memberService.findById(request.getId());
+
+        assertEquals(false, memberService.isDuplicateNickname(request.getNickname()));
+
+    }
+
+    @Test
+    public void 닉네임은_변경될_수_있어야_한다() throws Exception {
+    
+        //given
+        
+        //when
+        
+        //then
+    
+    }
+    
+    @Test
+    public void 사용자는_비활성화_될_수_있어야_한다() throws Exception {
+    
+        //given
+        
+        //when
+        
+        //then
+    
+    }
+    
 }

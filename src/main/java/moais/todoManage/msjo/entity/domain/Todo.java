@@ -1,5 +1,6 @@
 package moais.todoManage.msjo.entity.domain;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.collect.Lists;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
@@ -7,11 +8,15 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
 import lombok.experimental.FieldDefaults;
+import lombok.extern.slf4j.Slf4j;
 import moais.todoManage.msjo.entity.common.audit.BaseTime;
 import moais.todoManage.msjo.entity.common.enums.TodoStatus;
+import moais.todoManage.msjo.util.JSONUtil;
 import org.hibernate.annotations.Comment;
 import org.hibernate.annotations.DynamicUpdate;
+import org.jetbrains.annotations.NotNull;
 
+import java.io.Serializable;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Objects;
@@ -34,6 +39,7 @@ import java.util.Objects;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @ToString(exclude = "member")
 @Comment("할 일")
+@Slf4j
 public class Todo extends BaseTime {
 
     @Id
@@ -61,41 +67,45 @@ public class Todo extends BaseTime {
 
 
     /**
-     * TODO history 관리를 어떻게 할 지 고민 중. 남긴다면 history 생성은 이 곳에서만.
+     * TODO history 관리를 어떻게 할 지 고민 중. 남긴다면 history 생성은 이 곳에서만. -- DONE
+     *
      * @return
      */
 
     public boolean toTODO() {
-        TodoStatus status = TodoStatus.TODO;
-        this.status = status;
-
-        return true;
+        return updateStatus(TodoStatus.TODO);
     }
 
     public boolean toProgress() {
-        TodoStatus status = TodoStatus.IN_PROGRESS;
-        this.status = status;
-
-        return true;
+        return updateStatus(TodoStatus.IN_PROGRESS);
     }
 
     public boolean toDone() {
-        TodoStatus status = TodoStatus.DONE;
-        this.status = status;
+        return updateStatus(TodoStatus.DONE);
+    }
+
+    public boolean toPending() {
+        if (Objects.equals(this.status, TodoStatus.IN_PROGRESS)) {
+            return updateStatus(TodoStatus.PENDING);
+        }
+        log.error("Changing to the Pending state is only possible when in the Progress state.");
+        return false;
+    }
+
+    private boolean updateStatus(TodoStatus newStatus) {
+        String before = getJsonString();
+        this.status = newStatus;
+        String after = getJsonString();
+
+        TodoHistory history = new TodoHistory(before, after, this);
+        this.histories.add(history);
 
         return true;
     }
 
-    public boolean toPending() {
-        TodoStatus status = TodoStatus.PENDING;
 
-        if(Objects.equals(this.status, TodoStatus.IN_PROGRESS)) {
-            this.status = TodoStatus.PENDING;
-
-            return true;
-        }
-
-        return false;
+    private @NotNull String getJsonString() {
+        return JSONUtil.toJSONString(this);
     }
 
 }

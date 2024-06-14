@@ -11,10 +11,7 @@ public class SecurityUserInfo {
 
     private String id;
     private String password;
-    private String name;
-    private Long subjectSeq;
-
-    private Long round;
-    private Long centerSeq;
+    private Long seq;
+    private String nickname;
 
 }

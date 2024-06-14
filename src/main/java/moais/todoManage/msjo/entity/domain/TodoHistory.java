@@ -8,6 +8,7 @@ import lombok.NoArgsConstructor;
 import lombok.ToString;
 import lombok.experimental.FieldDefaults;
 import moais.todoManage.msjo.entity.common.audit.BaseTime;
+import moais.todoManage.msjo.entity.common.enums.UserType;
 import org.hibernate.annotations.Comment;
 import org.hibernate.annotations.DynamicUpdate;
 
@@ -38,9 +39,26 @@ public class TodoHistory extends BaseTime {
     @Comment("할 일 변경 내역 순차번호")
     Long seq;
 
+    @Comment("변경 전 data")
+    @Column(nullable = false)
+    String beforeData;
+    @Comment("변경 후 data")
+    @Column(nullable = false)
+    String afterData;
+
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "todo_seq")
     @Comment("할 일 순차번호")
     Todo todo;
+
+    protected TodoHistory(String before, String after, Todo todo) {
+        this.beforeData = before;
+        this.afterData = after;
+        this.todo = todo;
+    }
+
+    public static TodoHistory create(String before, String after, Todo todo) {
+        return new TodoHistory(before, after, todo);
+    }
 
 }

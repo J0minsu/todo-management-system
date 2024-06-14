@@ -26,13 +26,13 @@ import lombok.experimental.FieldDefaults;
 @AllArgsConstructor
 public class MemberCreateReq {
 
-    @NotEmpty(message = "id must be not null, empty")
+    @NotEmpty(message = "id must be not null or empty")
     String id;
     @NotEmpty
-    @NotEmpty(message = "nickname must be not null, empty")
+    @NotEmpty(message = "nickname must be not null or empty")
     String nickname;
     @NotEmpty
-    @NotEmpty(message = "password must be not null, empty")
+    @NotEmpty(message = "password must be not null or empty")
     String password;
 
 }

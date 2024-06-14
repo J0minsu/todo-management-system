@@ -12,22 +12,22 @@ import java.util.List;
 @Slf4j
 public class SecurityUserDetails implements UserDetails {
 
-    private final SecurityUserInfo jwtSecurityUserInfo;
+    private final SecurityUserInfo securityUserInfo;
     private final List<? extends GrantedAuthority> authorities;
 
-    public SecurityUserDetails(SecurityUserInfo jwtSecurityUserInfo, List<? extends GrantedAuthority> authorities) {
-        this.jwtSecurityUserInfo = jwtSecurityUserInfo;
+    public SecurityUserDetails(SecurityUserInfo securityUserInfo, List<? extends GrantedAuthority> authorities) {
+        this.securityUserInfo = securityUserInfo;
         this.authorities = authorities;
     }
 
     @Override
     public String getUsername() {
-        return jwtSecurityUserInfo.getId();
+        return securityUserInfo.getId();
     }
 
     @Override
     public String getPassword() {
-        return jwtSecurityUserInfo.getPassword();
+        return securityUserInfo.getPassword();
     }
 
     @Override
@@ -35,21 +35,16 @@ public class SecurityUserDetails implements UserDetails {
         return authorities;
     }
 
-    public String getName() {
-        return jwtSecurityUserInfo.getName();
+    public String getId() {
+        return securityUserInfo.getId();
     }
 
-    public Long getSubjectSeq() {
-        return jwtSecurityUserInfo.getSubjectSeq();
+    public Long getSeq() {
+        return securityUserInfo.getSeq();
     }
 
-
-    public Long getCenterSeq() {
-        return jwtSecurityUserInfo.getCenterSeq();
-    }
-
-    public Long getRound() {
-        return jwtSecurityUserInfo.getRound();
+    public String getNickname() {
+        return securityUserInfo.getNickname();
     }
 
     /**

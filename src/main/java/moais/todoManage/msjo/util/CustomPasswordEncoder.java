@@ -42,8 +42,6 @@ public class CustomPasswordEncoder {
                     MessageDigest digest = MessageDigest.getInstance("SHA-256");
                     byte[] hashedBytes = digest.digest(saltedPassword.getBytes());
 
-                    log.info("encode pwd :: {}", new String(Hex.encode(hashedBytes)));
-
                     return new String(Hex.encode(hashedBytes));
                 } catch (NoSuchAlgorithmException e) {
                     throw new RuntimeException("Error encoding password", e);
